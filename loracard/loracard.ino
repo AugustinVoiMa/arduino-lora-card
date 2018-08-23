@@ -1,7 +1,7 @@
 #include "LoRa_adapter.h"
 #include "Serial_adapter.h"
 
-byte lp_address[] = {192, 168, 1, 10};
+byte lp_address[] = {192, 168, 1, 20};
 uint8_t bcast_lp[] = {255, 255, 255, 255}; // broadcast
 
 Serial_adapter* sa;
@@ -18,6 +18,7 @@ void setup(){
 
 void loop(){
   la->checkReceived();
+  sa->checkNewMessage();
 }
 
 

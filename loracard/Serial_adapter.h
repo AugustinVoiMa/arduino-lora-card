@@ -9,6 +9,8 @@ class Serial_adapter{
   String input;
   void (*callbackOnLocalMessage)(String str);
   static Serial_adapter* sa;  
+  static String message;  
+  static bool new_message;
 public:
   static Serial_adapter* getSerialAdapter(){
     if(nullptr == Serial_adapter::sa){
@@ -22,7 +24,7 @@ public:
   }
   void info(String str);
   void serialEvent();
-
+  void checkNewMessage();
 
 private:
   Serial_adapter();

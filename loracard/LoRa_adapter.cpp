@@ -29,12 +29,17 @@ void LoRa_adapter::onReceive(int packetSize) {
     // TODO: error length does not match expected
     return;
   }
+  LoRa_adapter::packet = serial_packet;
+  LoRa_adapter::packet_len = i;
+  LoRa_adapter::new_packet = true; 
 
 }
 void LoRa_adapter::checkReceived(){
   if(! LoRa_adapter::new_packet)
     return ;
-    
+  
+  LoRa_adapter::new_packet = false;
+  
   Serial_adapter sa = *Serial_adapter::getSerialAdapter();
   sa.info("Check received ok!");
   lora_proto::Packet rx = lora_proto::Packet::deserialize(LoRa_adapter::packet_len,LoRa_adapter::packet);  
