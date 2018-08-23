@@ -23,7 +23,12 @@ namespace lora_proto{
     uint32_t src, dst;
     uint8_t proto, data_len;
     uint8_t* data;
+    uint8_t* serial;
   public:
+    ~Packet(){
+      if(this->data)
+        free(this->serial);
+    }
     static Packet create(uint32_t src, uint32_t dst, uint8_t proto, uint8_t data_len, uint8_t data[] ){ // TX
       Packet pk = Packet();
       pk.src=src;

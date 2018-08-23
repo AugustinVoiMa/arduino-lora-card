@@ -38,7 +38,7 @@ void Serial_adapter::checkNewMessage(){
     return ;
   Serial_adapter::new_message = false;
   this->info("New Message detected: "+this->message);
-  this->callbackOnLocalMessage(input);
+  this->callbackOnLocalMessage(this->message);
 }
 
 Serial_adapter* Serial_adapter::sa = nullptr;

@@ -24,8 +24,8 @@ void loop(){
 
 void sendMessage(String str){
   sa->info("sendMessage("+str+");");
-  uint8_t message[str.length()];
-  str.toCharArray(message, (char*) str.length());
+  uint8_t message[str.length()];  
+  str.toCharArray((char*) message, str.length());
   la->sendMessage( bcast_lp, str.length(), message );
   return ;
 }

@@ -3,11 +3,16 @@
 void LoRa_adapter::init(uint8_t lp_address[]){
   Serial_adapter sa = *Serial_adapter::getSerialAdapter();
   this->lp_address=lora_proto::bytes_to_uint32_t(lp_address);
-
+  Serial.println(this->lp_address, HEX);
+  Serial.print(lp_address[0], HEX);
+  Serial.print(lp_address[1], HEX);
+  Serial.print(lp_address[2], HEX);
+  Serial.println(lp_address[3], HEX);
   if (!LoRa.begin(LORA_FREQ)) {
     sa.info("LoRa init failed. Check your connections.");
     while (true);
   }
+  LoRa.enableCrc();
   LoRa.onReceive(LoRa_adapter::onReceive);
   LoRa.receive();  
 }
@@ -43,11 +48,11 @@ void LoRa_adapter::checkReceived(){
   
   Serial_adapter sa = *Serial_adapter::getSerialAdapter();
   sa.info("Check received ok! row packet: ");
-  int i = 0;
+  int i = 0;  
   while( i < LoRa_adapter::packet_len){
     for(int o = 0; o < 4 && i+o < LoRa_adapter::packet_len; o++){
-      Serial.print(LoRa_adapter::packet[i], HEX);
-      Serial.print(" ");
+      Serial.print(LoRa_adapter::packet[i+o], HEX);
+      Serial.print("\t");
     }
     Serial.println();
     i+= 4;
@@ -76,10 +81,24 @@ void LoRa_adapter::sendMessage(uint8_t dst[], uint8_t data_len, uint8_t data[]){
 
 void LoRa_adapter::sendMessage(uint32_t dst, uint8_t data_len, uint8_t data[]){
   Serial_adapter sa = *Serial_adapter::getSerialAdapter();
-  sa.info("Sending message");
+  Serial.print("Sending message from ");
+  Serial.print(this->lp_address, HEX);
+  Serial.print(" to ");
+  Serial.println(dst, HEX);
+  
   lora_proto::Packet pk = lora_proto::Packet::create(this->lp_address, dst, 0, data_len, data);
   uint8_t packet_len;
-  uint8_t* packet = pk.serialize(&packet_len);
+  uint8_t* packet = pk.serialize(&packet_len);  
+  int i = 0;
+  while( i < packet_len){
+    for(int o = 0; o < 4 && i+o < packet_len; o++){
+      Serial.print(packet[i+o], HEX);
+      Serial.print("\t");
+    }
+    Serial.println();
+    i+= 4;
+  }
+
   if(!LoRa.beginPacket()){
     sa.info("Error beginning LoRa packet");
     LoRa.receive();
