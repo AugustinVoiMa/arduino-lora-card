@@ -39,6 +39,8 @@ namespace lora_proto{
     uint8_t* serialize(uint8_t* packet_len);
     
     bool accept(uint32_t lp_address){ // True if localhost is the destination of this packet or broadcast
+      Serial.println(lp_address, HEX);
+      Serial.println(this->dst, HEX);
       return lp_address==this->dst || this->dst==0xFFFFFFFF;
     }
 
