@@ -71,8 +71,8 @@ bool LoRa_adapter::checkReceived(){
     sa.info(rx.getStringData());
   }
 
-  delete &rx;
   LoRa_adapter::new_packet = false;
+  return true;
 
 }
 
@@ -95,7 +95,6 @@ void LoRa_adapter::sendMessage(uint32_t dst, uint8_t data_len, uint8_t data[]){
   uint8_t* packet = pk.serialize(LoRa_adapter::packet, &packet_len);  
   if(!LoRa.beginPacket()){
     sa.info("Error beginning LoRa packet");
-    delete &pk;
     LoRa.receive();
     return;
   }  
@@ -115,7 +114,6 @@ void LoRa_adapter::sendMessage(uint32_t dst, uint8_t data_len, uint8_t data[]){
   LoRa.endPacket();
   sa.info("Sent");
   LoRa_adapter::new_packet=false;
-  delete &pk;
   LoRa.receive();
   
   
