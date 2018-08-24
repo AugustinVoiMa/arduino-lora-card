@@ -24,7 +24,7 @@ public:
   }
   void info(String str);
   void serialEvent();
-  void checkNewMessage();
+  bool checkNewMessage();
 
 private:
   Serial_adapter();

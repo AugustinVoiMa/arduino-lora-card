@@ -14,40 +14,33 @@ namespace lora_proto
     pk.proto = data[i++];
     pk.data_len = data[i++];
     pk.data = &data[i];
-    if(pk.serial){
-      free(pk.serial);
-      pk.serial=nullptr;
-    }
     pk.serial = data;
+    return pk;
   }
   
-  uint8_t* Packet::serialize(uint8_t* packet_len){
-    if(this->serial){
-      free(this->serial);
-      this->serial=nullptr;
-    }
-    this->serial = (uint8_t*) malloc(sizeof(uint8_t) * (10 + this->data_len)) ; // Header len + data len
+  uint8_t* Packet::serialize(uint8_t* buf, uint8_t* packet_len){    
     int i = 0;
-    uint32_t_into_bytes(&(this->serial[i]), this->src);    
+    uint32_t_into_bytes(&(buf[i]), this->src);    
     i += 4;
-    uint32_t_into_bytes(&(this->serial[i]), this->dst);
+    uint32_t_into_bytes(&(buf[i]), this->dst);
     i += 4;
-    this->serial[i++] = this->proto;
-    this->serial[i++] = this->data_len;
+    buf[i++] = this->proto;
+    buf[i++] = this->data_len;
     for(int o = 0; o < this->data_len; o++)
-      this->serial[i++] = this->data[o];
+      buf[i++] = this->data[o];
     *packet_len = i;
-    return this->serial;
+    this->serial = buf;
+    return buf;
   }
   
-  uint32_t bytes_to_uint32_t(uint8_t data[]){    
+  uint32_t bytes_to_uint32_t(uint8_t* data){    
     return (uint32_t) data[0] << 24 
           |(uint32_t) data[1] << 16 
           |(uint32_t) data[2] << 8 
           |(uint32_t) data[3];
   }
   
-  void uint32_t_into_bytes(uint8_t dst[], uint32_t n ){    
+  void uint32_t_into_bytes(uint8_t* dst, uint32_t n ){    
     dst[0] = (uint8_t)(n>>24);
     dst[1] = (uint8_t)(n>>16);
     dst[2] = (uint8_t)(n>>8);

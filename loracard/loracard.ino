@@ -10,7 +10,7 @@ LoRa_adapter* la;
 
 void setup(){
   sa = Serial_adapter::getSerialAdapter();
-  la = new LoRa_adapter();
+  la = LoRa_adapter::getLoRaAdapter();
   la->init(lp_address);  
   sa->setCallBackOnLocalMessage(&sendMessage);
   sa->info("Ready");

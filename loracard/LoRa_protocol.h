@@ -22,16 +22,10 @@ namespace lora_proto{
   class Packet{
     uint32_t src, dst;
     uint8_t proto, data_len;
-    uint8_t* data;
+    uint8_t* data;    
     uint8_t* serial;
-  public:
-    ~Packet(){
-      if(this->serial){
-        free(this->serial);
-        this->serial=nullptr;
-      }     
-    }
-    static Packet create(uint32_t src, uint32_t dst, uint8_t proto, uint8_t data_len, uint8_t data[] ){ // TX
+  public:    
+    static Packet create(uint32_t src, uint32_t dst, uint8_t proto, uint8_t data_len, uint8_t* data ){ // TX
       Packet pk = Packet();
       pk.src=src;
       pk.dst=dst;
@@ -41,19 +35,21 @@ namespace lora_proto{
       return pk;
     }
 
-    static Packet deserialize(uint8_t size, uint8_t data[]); // deserialize RX
+    static Packet deserialize(uint8_t size, uint8_t* data); // deserialize RX
 
-    uint8_t* serialize(uint8_t* packet_len);
+    uint8_t* serialize(uint8_t* buf, uint8_t* packet_len);
     
     bool accept(uint32_t lp_address){ // True if localhost is the destination of this packet or broadcast
+      /*Serial.print("lp_address: \t");
       Serial.println(lp_address, HEX);
-      Serial.println(this->dst, HEX);
+      Serial.print("dst: \t ");
+      Serial.println(this->dst, HEX);*/
       return lp_address==this->dst || this->dst==0xFFFFFFFF;
     }
 
     void printInfos();
     char* getStringData();
-    
+    uint32_t getDst(){ return this->dst; }
   };
 
 
