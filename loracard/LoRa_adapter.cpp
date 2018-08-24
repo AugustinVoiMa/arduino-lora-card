@@ -24,10 +24,10 @@ void LoRa_adapter::onReceive(int packetSize) {
   sa->info("Got a packet");
   if (packetSize == 0) return;
 
-  uint8_t serial_packet[packetSize];
+  uint8_t* serial_packet = (uint8_t*) malloc(sizeof(uint8_t) * packetSize);
   uint8_t i = 0;
   while (LoRa.available()) {
-    serial_packet[i++] = LoRa.read();
+    serial_packet[i++] = (uint8_t) LoRa.read();
   }
 
   if (i != packetSize) {
@@ -37,8 +37,8 @@ void LoRa_adapter::onReceive(int packetSize) {
   LoRa_adapter::packet = serial_packet;
   LoRa_adapter::packet_len = i;
   LoRa_adapter::new_packet = true; 
-  sa->info("Packet capture ok");
-
+  sa->info("Packet capture ok:");
+  i = 0;  
 }
 void LoRa_adapter::checkReceived(){
   if(! LoRa_adapter::new_packet)
@@ -49,6 +49,7 @@ void LoRa_adapter::checkReceived(){
   Serial_adapter sa = *Serial_adapter::getSerialAdapter();
   sa.info("Check received ok! row packet: ");
   int i = 0;  
+  /*
   while( i < LoRa_adapter::packet_len){
     for(int o = 0; o < 4 && i+o < LoRa_adapter::packet_len; o++){
       Serial.print(LoRa_adapter::packet[i+o], HEX);
@@ -57,17 +58,18 @@ void LoRa_adapter::checkReceived(){
     Serial.println();
     i+= 4;
   }
+  */
 
   Serial.println();
   Serial.println();
   lora_proto::Packet rx = lora_proto::Packet::deserialize(LoRa_adapter::packet_len,LoRa_adapter::packet);  
   if(rx.accept(this->lp_address)){
     sa.info("==========ACCEPTED==========");
-    sa.info(rx.getInfos());
+    rx.printInfos();
     sa.info(rx.getStringData());
   }else{
     sa.info("==========REFUSED==========");
-    sa.info(rx.getInfos());
+    rx.printInfos();
     sa.info(rx.getStringData());
   }
 }

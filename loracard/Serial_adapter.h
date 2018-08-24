@@ -1,7 +1,7 @@
 #ifndef _SERIAL_ADAPTER
 #define _SERIAL_ADAPTER
 
-#define SERIAL_RATE 4800
+#define SERIAL_RATE 9600
 
 #include "Arduino.h"
 

@@ -4,19 +4,28 @@
 #include "Arduino.h"
 namespace lora_proto
 {
-  static Packet Packet::deserialize(uint8_t size, uint8_t data[]){
+  static Packet Packet::deserialize(uint8_t size, uint8_t* data){
     Packet pk;
-    uint8_t i = 0;
-    pk.src = bytes_to_uint32_t(data[i]);
+    int i = 0;
+    pk.src = bytes_to_uint32_t(&data[i]);    
     i+= 4;
-    pk.dst = bytes_to_uint32_t(data[i]);
+    pk.dst = bytes_to_uint32_t(&data[i]);    
     i+=4;
     pk.proto = data[i++];
     pk.data_len = data[i++];
-    pk.data = data[i];
+    pk.data = &data[i];
+    if(pk.serial){
+      free(pk.serial);
+      pk.serial=nullptr;
+    }
+    pk.serial = data;
   }
   
   uint8_t* Packet::serialize(uint8_t* packet_len){
+    if(this->serial){
+      free(this->serial);
+      this->serial=nullptr;
+    }
     this->serial = (uint8_t*) malloc(sizeof(uint8_t) * (10 + this->data_len)) ; // Header len + data len
     int i = 0;
     uint32_t_into_bytes(&(this->serial[i]), this->src);    
@@ -31,7 +40,7 @@ namespace lora_proto
     return this->serial;
   }
   
-  uint32_t bytes_to_uint32_t(uint8_t data[]){
+  uint32_t bytes_to_uint32_t(uint8_t data[]){    
     return (uint32_t) data[0] << 24 
           |(uint32_t) data[1] << 16 
           |(uint32_t) data[2] << 8 
@@ -53,17 +62,35 @@ namespace lora_proto
     res += String(address & 0xFF);
   }
   
-  String Packet::getInfos(){
-    String str = "";
-    str.reserve(128);
-    str += "From: "+address_to_string(this->src)+"\n";
-    str += "To: "+address_to_string(this->dst)+"\n";
-    str += "Protocol: "+String(this->proto)+"\t";
-    str += "Data ("+String(this->data_len)+" bytes)\n";
-    return str;
+  void Packet::printInfos(){
+    Serial.println("=====HEADER=====");
+    Serial.print("From: ");
+    Serial.println(this->src, HEX);
+    Serial.print("To: ");
+    Serial.println(this->dst, HEX);
+    Serial.print("Using protocol: ");
+    Serial.println(this->proto,DEC);
+    Serial.print("Data length: ");
+    Serial.println(this->data_len, HEX);    
   }
   
-  String Packet::getStringData(){
-    return (char*)this->data;
+  char* Packet::getStringData(){
+    char* chardata = (char*)this->data;
+    Serial.println(chardata);
+    return chardata;
+  }
+
+  void printRawPacket(uint8_t* pk, uint8_t len){
+    Serial.println("Top Raw packet");
+    int i = 0;
+    while( i < len){
+      for(int o = 0; o < 4 && i+o < len; o++){
+        Serial.print(pk[i+o], HEX);
+        Serial.print("\t");
+      }
+      Serial.println();
+      i+= 4;
+    }
+    Serial.println("Tail Raw packet");
   }
 };

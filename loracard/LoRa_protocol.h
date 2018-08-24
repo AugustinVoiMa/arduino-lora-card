@@ -26,8 +26,10 @@ namespace lora_proto{
     uint8_t* serial;
   public:
     ~Packet(){
-      if(this->data)
+      if(this->serial){
         free(this->serial);
+        this->serial=nullptr;
+      }     
     }
     static Packet create(uint32_t src, uint32_t dst, uint8_t proto, uint8_t data_len, uint8_t data[] ){ // TX
       Packet pk = Packet();
@@ -49,12 +51,13 @@ namespace lora_proto{
       return lp_address==this->dst || this->dst==0xFFFFFFFF;
     }
 
-    String getInfos();
-    String getStringData();
+    void printInfos();
+    char* getStringData();
+    
   };
 
 
-
+  void printRawPacket(uint8_t* pk, uint8_t len);
   uint32_t bytes_to_uint32_t(uint8_t data[]);
   void uint32_t_into_bytes(uint8_t dst[], uint32_t n );
 };
