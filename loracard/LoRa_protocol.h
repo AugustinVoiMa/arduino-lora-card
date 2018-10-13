@@ -15,13 +15,13 @@
 #define _LORA_PROTOCOL
 
 #include "Arduino.h"
-
+#include "config.h"
 
 
 namespace lora_proto{
   class Packet{
     uint32_t src, dst;
-    uint8_t proto, data_len;
+    uint8_t proto, data_len, serial_len;
     uint8_t* data;    
     uint8_t* serial;
   public:    
@@ -32,6 +32,7 @@ namespace lora_proto{
       pk.proto=proto;
       pk.data_len=data_len;
       pk.data=data;
+      pk.serial_len = 0;
       return pk;
     }
 

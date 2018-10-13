@@ -11,7 +11,13 @@ Serial_adapter::Serial_adapter(){
 void setCallBackOnLocalMessage(void (&callbackOnLocalMessage)(String str));
 
 void Serial_adapter::info(String str){
-  Serial.println(str);
+  if(SERIAL_DEBUG)
+    Serial.println(str);
+}
+
+void Serial_adapter::info_nnl(String str){
+  if(SERIAL_DEBUG)
+    Serial.print(str);
 }
 
 void Serial_adapter::serialEvent(){

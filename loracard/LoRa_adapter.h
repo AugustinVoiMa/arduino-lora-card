@@ -5,6 +5,8 @@
 
 #include <SPI.h>
 #include <LoRa.h>
+#include "config.h"
+
 
 #include "LoRa_protocol.h"
 #include "Serial_adapter.h"

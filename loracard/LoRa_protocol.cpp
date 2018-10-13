@@ -1,10 +1,10 @@
 #include "LoRa_protocol.h"
-
+#include "Serial_adapter.h"
 
 #include "Arduino.h"
 namespace lora_proto
 {
-  static Packet Packet::deserialize(uint8_t size, uint8_t* data){
+  Packet Packet::deserialize(uint8_t size, uint8_t* data){
     Packet pk;
     int i = 0;
     pk.src = bytes_to_uint32_t(&data[i]);    
@@ -15,6 +15,7 @@ namespace lora_proto
     pk.data_len = data[i++];
     pk.data = &data[i];
     pk.serial = data;
+    pk.serial_len = size;
     return pk;
   }
   
@@ -53,37 +54,36 @@ namespace lora_proto
     res += String((address>> 16 ) & 0xFF)+".";
     res += String((address>> 8 ) & 0xFF)+".";
     res += String(address & 0xFF);
+    return res;
   }
   
   void Packet::printInfos(){
-    Serial.println("=====HEADER=====");
-    Serial.print("From: ");
-    Serial.println(this->src, HEX);
-    Serial.print("To: ");
-    Serial.println(this->dst, HEX);
-    Serial.print("Using protocol: ");
-    Serial.println(this->proto,DEC);
-    Serial.print("Data length: ");
-    Serial.println(this->data_len, HEX);    
+    Serial_adapter* sa = Serial_adapter::getSerialAdapter();
+    sa->info("=====HEADER=====");
+    sa->info("From: "+String(this->src, HEX));
+    sa->info("To: "+String(this->dst, HEX));
+    sa->info("Using protocol: "+String(this->proto,DEC)+" Data length: "+String(this->data_len, HEX));
   }
   
   char* Packet::getStringData(){
     char* chardata = (char*)this->data;
-    Serial.println(chardata);
     return chardata;
   }
 
-  void printRawPacket(uint8_t* pk, uint8_t len){
-    Serial.println("Top Raw packet");
-    int i = 0;
-    while( i < len){
-      for(int o = 0; o < 4 && i+o < len; o++){
-        Serial.print(pk[i+o], HEX);
-        Serial.print("\t");
+  void printRawPacket(uint8_t* pk, uint8_t len){    
+    if(SERIAL_DEBUG){
+      Serial_adapter* sa = Serial_adapter::getSerialAdapter();
+      sa->info("Top Raw packet");
+      int i = 0;
+      while( i < len){
+        for(int o = 0; o < 4 && i+o < len; o++){
+          Serial.print(pk[i+o], HEX);
+          Serial.print("\t");
+        }
+        Serial.println();
+        i+= 4;
       }
-      Serial.println();
-      i+= 4;
+      Serial.println("Tail Raw packet");
     }
-    Serial.println("Tail Raw packet");
   }
 };

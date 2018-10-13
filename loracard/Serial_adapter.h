@@ -4,7 +4,7 @@
 #define SERIAL_RATE 9600
 
 #include "Arduino.h"
-
+#include "config.h"
 class Serial_adapter{
   String input;
   void (*callbackOnLocalMessage)(String str);
@@ -23,6 +23,8 @@ public:
     this->callbackOnLocalMessage = callbackOnLocalMessage;
   }
   void info(String str);
+  void info_nnl(String str);
+
   void serialEvent();
   bool checkNewMessage();
 

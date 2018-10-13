@@ -1,5 +1,7 @@
 #include "LoRa_adapter.h"
 #include "Serial_adapter.h"
+
+#define DEF_LP_ADDRESS
 #include "config.h"
 
 uint8_t bcast_lp[] = {255, 255, 255, 255}; // broadcast
